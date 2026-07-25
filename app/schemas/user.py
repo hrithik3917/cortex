@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from datetime import datetime
-from schemas.book import BookResponse
+from app.schemas.book import BookResponse
 
 
 class UserCreate(BaseModel):

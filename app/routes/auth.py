@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from database import get_db
-from schemas.token import TokenResponse
-from services.auth_services import login_user
+from app.database import get_db
+from app.schemas.token import TokenResponse
+from app.services.auth_services import login_user
 from typing import Annotated
 
 router = APIRouter(

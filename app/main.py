@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from database import Base, engine
-from cache.redis_client import redis_client
+from app.database import Base, engine
+from app.cache.redis_client import redis_client
 from contextlib import asynccontextmanager
-from routes.book import router as book_router
-from routes.user import router as user_router
-from routes.auth import router as auth_router
+from app.routes.book import router as book_router
+from app.routes.user import router as user_router
+from app.routes.auth import router as auth_router
 
 
 Base.metadata.create_all(bind=engine)

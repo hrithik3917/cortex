@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
-from schemas.user import UserCreate, UserResponse, UserWithBooks
-from schemas.book import MessageResponse
-from services.user_service import fetch_user, register_user, remove_user
+from app.database import get_db
+from app.schemas.user import UserCreate, UserResponse, UserWithBooks
+from app.schemas.book import MessageResponse
+from app.services.user_service import fetch_user, register_user, remove_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

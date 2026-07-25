@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models.user import (
+from app.models.user import (
     get_user_by_id,
     get_user_by_email,
     create_user as create_user_model,
     delete_user,
 )
-from schemas.user import UserCreate
-from auth.hashing import hash_password
+from app.schemas.user import UserCreate
+from app.auth.hashing import hash_password
 
 
 def fetch_user(db: Session, user_id: int):

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from app.database import get_db
 from typing import Optional
-from auth.dependencies import get_current_user
-from models.user import User
-from schemas.book import Bookcreate, BookUpdate, BookResponse, MessageResponse
-from services.book_service import (
+from app.auth.dependencies import get_current_user
+from app.models.user import User
+from app.schemas.book import Bookcreate, BookUpdate, BookResponse, MessageResponse
+from app.services.book_service import (
     fetch_all_books,
     fetch_book,
     insert_book,

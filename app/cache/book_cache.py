@@ -1,5 +1,5 @@
 import json 
-from cache.redis_client import redis_client
+from app.cache.redis_client import redis_client
 
 ALL_BOOKS_TTL = 60
 SINGLE_BOOK_TTL = 300

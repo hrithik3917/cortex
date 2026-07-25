@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models.user import get_user_by_email
-from auth.hashing import verify_password
-from auth.jwt_handler import create_access_token
-from schemas.token import TokenResponse
+from app.models.user import get_user_by_email
+from app.auth.hashing import verify_password
+from app.auth.jwt_handler import create_access_token
+from app.schemas.token import TokenResponse
 
 
 def login_user(db: Session, email: str, password: str) -> TokenResponse:

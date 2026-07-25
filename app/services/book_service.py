@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models.book import (
+from app.models.book import (
     get_all_books,
     get_book_by_id,
     get_book_by_title,
@@ -8,9 +8,9 @@ from models.book import (
     update_book,
     delete_book,
 )
-from schemas.book import Bookcreate, BookUpdate, BookResponse
-from models.user import User
-from cache.book_cache import (
+from app.schemas.book import Bookcreate, BookUpdate, BookResponse
+from app.models.user import User
+from app.cache.book_cache import (
     get_cached_book, 
     get_cached_books,
     set_cached_book,
