@@ -3,9 +3,9 @@ Standalone script demonstrating the 3 required SQLAlchemy relationship queries.
 Run from the week1_practise directory:
     python -m book_api.test_queries
 """
-from book_api.database import SessionLocal, Base, engine
-from book_api.models.user import User
-from book_api.models.book import Book
+from app.database import SessionLocal, Base, engine
+from app.models.user import User
+from app.models.book import Book
 
 Base.metadata.create_all(bind=engine)
 
