@@ -1,5 +1,5 @@
 from app.database import Base
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, String, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
 from typing import Optional
 
@@ -15,6 +15,11 @@ class Book(Base):
         Integer, ForeignKey("users.id"), nullable=True
     )
 
+    __table_args__ = (
+        Index("idx_books_owner_id", "owner_id"),
+        Index("idx_books_title", "title"),
+    )
+
     # String ref "User" — SQLAlchemy resolves this lazily, no import needed
     owner = relationship("User", back_populates="books")
 
@@ -22,8 +27,23 @@ class Book(Base):
         return f"title={self.title}, author={self.author}"
     
 
-def get_all_books(db:Session) -> list[Book]:
-    return db.query(Book).all()
+def get_all_books(
+        db:Session,
+        skip: int = 0,
+        limit: int = 10,
+        author: str | None = None
+        ) -> tuple[list[Book], int]:
+
+    query = db.query(Book)
+
+    if author:
+        query = query.filter(Book.author.ilike(f"%{author}%"))
+
+    total = query.count()
+
+    books = query.offset(skip).limit(limit).all()
+
+    return books, total
 
 
 def get_book_by_id(book_id:int, db: Session) -> Optional[Book]:

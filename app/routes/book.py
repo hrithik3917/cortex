@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from typing import Optional
 from app.auth.dependencies import get_current_user
 from app.models.user import User
+from app.schemas.pagination import PaginatedBooksResponse
 from app.schemas.book import Bookcreate, BookUpdate, BookResponse, MessageResponse
 from app.services.book_service import (
     fetch_all_books,
@@ -20,9 +21,15 @@ router = APIRouter(
 
 
 
-@router.get("/", response_model=list[BookResponse])
-def get_books(author: Optional[str] = None, db: Session = Depends(get_db)):
-    return fetch_all_books(db, author)      
+@router.get("/", response_model=PaginatedBooksResponse)
+def get_books(
+    page: int = Query(default=1, ge=1, description="Page number, starting from 1"),
+    size: int = Query(default=10, ge=1, le=100, description="Items per page, max 100"),
+    author: Optional[str] = None, 
+    db: Session = Depends(get_db)
+    ):
+
+    return fetch_all_books(db, page=page, size=size, author=author)      
 
 
 @router.get("/{book_id}", response_model= BookResponse)

@@ -18,24 +18,38 @@ from app.cache.book_cache import (
     invalidate_book
 )
 
-def fetch_all_books(db: Session, author : str | None = None) -> list:
+def fetch_all_books(
+        db: Session,
+        page:int = 1,
+        size: int=10,
+        author : str | None = None
+        ) -> dict:
     # Step 1 — check cache
-    cached = get_cached_books(author)
+    cached = get_cached_books(page, size, author)
     if cached is not None:
         return cached
     
-    # Step 2 — cache miss: query Postgres
-    books = get_all_books(db)
-    if author:
-        books = [b for b in books if author.lower() in b.author.lower()]
+    # Step 2 — cache miss: query Postgres with pagination
+    skip = (page-1) * size
+    books, total = get_all_books(db, skip=skip, limit=size, author=author)
 
      # Step 3 — serialize and store in cache
     # model_validate converts SQLAlchemy object → Pydantic, model_dump → plain dict
     
     books_data = [BookResponse.model_validate(b).model_dump() for b in books]
-    set_cached_books(books_data, author)
+    total_pages = -(-total // size) if total > 0 else 1
 
-    return books
+    result = {
+        "items": books_data,
+        "total": total,
+        "page": page,
+        "size": size,
+        "pages": total_pages
+    }
+
+    set_cached_books(result, page, size, author)
+
+    return result
 
 
 def fetch_book(db: Session, book_id:int):

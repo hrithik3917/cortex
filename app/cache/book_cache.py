@@ -6,8 +6,13 @@ SINGLE_BOOK_TTL = 300
 
 # --- READ from cache ---
 
-def get_cached_books(author: str | None = None) -> list | None:
-    key = f"books:all:{author or 'none'}"
+def get_cached_books(
+        page: int,
+        size: int,
+        author: str | None = None
+        ) -> dict | None:
+    
+    key = f"books:all:page={page}:size={size}:author={author or 'none'}"
     cached = redis_client.get(key)
 
     if cached:
@@ -38,8 +43,14 @@ def get_cached_book(book_id: int) -> dict | None:
 
 # --- WRITE to cache ---
 
-def set_cached_books(books_data: list, author: str | None = None) -> None:
-    key = f"books:all:{author or 'none'}"
+def set_cached_books(
+        books_data: dict,
+        page: int,
+        size:int, 
+        author: str | None = None
+        ) -> None:
+    
+    key = f"books:all:page={page}:size={size}:author={author or 'none'}"
     redis_client.setex(key, ALL_BOOKS_TTL, json.dumps(books_data))
 
 def set_cached_book(book_id: int, book_data: dict) -> None:
