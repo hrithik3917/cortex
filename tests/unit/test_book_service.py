@@ -8,7 +8,7 @@ from app.services.book_service import(
     modify_book,
     remove_book,
 )
-from app.schemas.book import BookResponse
+from app.schemas.book import BookResponse, Bookcreate, BookUpdate
 
 # ---- Fixtures ------------------------------
 
@@ -129,3 +129,35 @@ def test_fetch_book_returns_cached_dict_on_cache_hit(mock_db):
         result = fetch_book(mock_db, book_id=1)
         assert result == cached
         assert result["title"] == "Clean Code"
+
+
+# ---- create_book tests ------------------------------
+
+def test_insert_book_raises_400_on_duplicate_title(mock_db, mock_user):
+    # Scenario: a book with this title already exists in Postgres
+    # Expected: 400 HTTPException — duplicate rejected before insert
+
+    book_data = Bookcreate(title="Clean Code", author="Martin", pages=464)
+    fake_exisitng = MagicMock()         #It represents the already-exisiting book
+
+    with patch("app.services.book_service.insert_book", return_value=fake_exisitng):
+        with pytest.raises(HTTPException) as exc_info:
+            insert_book(mock_db, book_data, mock_user)
+
+        assert exc_info.value.status_code == 400
+
+
+def test_insert_book_succeeds_when_title_is_unique(mock_db, mock_user):
+    # Scenario: title doesn't exist yet → book is inserted → cache invalidated
+    # Expected: returns the newly inserted book
+
+    book_data = Bookcreate(title="New Book", author="Author", pages=200)
+    fake_book = MagicMock()
+    fake_book.id = 2
+
+    with patch("app.services.book_service.get_book_by_title", return_value=None):
+        with patch("app.services.book_service.insert_book_model", return_value=fake_book):
+            with patch("app.services.book_service.invalidate_book"):
+                result = insert_book(mock_db, book_data, mock_user)
+                assert result == fake_book
+
