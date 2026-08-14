@@ -25,7 +25,7 @@ def mock_user():
 
 
 
-# ---- fetch_all_books test ------------------------------
+# ---- fetch_all_books tests ------------------------------
 
 def test_fetch_all_books_returns_cached_dict_on_hit(mock_db):
     # Scenario: Redis already has this page cached
@@ -107,3 +107,25 @@ def test_fetch_all_books_filter_by_author(mock_db):
 
                 # Confirm the author filter reached the DB layer
                 mock_query.assert_called_once_with(mock_db, skip=0, limit=10, author="Martin")
+
+
+# ---- fetch_book tests ------------------------------
+
+def test_fetch_book_raises_404_when_not_in_cache_or_db(mock_db):
+    # Scenario: Redis has nothing (cache miss), Postgres has nothing (DB miss)
+    with patch("app.services.book_service.get_cached_books", return_value=None):
+        with patch("app.services.book_service.get_book_by_id", return_value=None):
+            with pytest.raises(HTTPException) as exc_info:
+                fetch_book(mock_db, book_id = 999)
+            assert exc_info.value.status_code == 404
+
+
+def test_fetch_book_returns_cached_dict_on_cache_hit(mock_db):
+    # Scenario: Redis has the book (cache hit)
+    # Expected: returns the cached dict immediately — Postgres never queried
+    cached = {"id": 1, "title": "Clean Code", "author": "Martin", "pages": 464, "owner_id": 1}
+
+    with patch("app.services.book_service.get_cached_book", return_value=cached):
+        result = fetch_book(mock_db, book_id=1)
+        assert result == cached
+        assert result["title"] == "Clean Code"
