@@ -161,3 +161,33 @@ def test_insert_book_succeeds_when_title_is_unique(mock_db, mock_user):
                 result = insert_book(mock_db, book_data, mock_user)
                 assert result == fake_book
 
+
+# ---- modify_book tests ------------------------------
+
+def test_modify_book_raises_403_when_user_is_not_owner(mock_db, mock_user):
+    # Scenario: book's owner_id=999, mock_user.id=1 → mismatch
+    # Expected: 403 — can't edit someone else's book
+
+    cached_book = {"id": 1, "title": "Test", "author": "Author", "pages": 100, "owner_id": 999}
+    book_data = BookUpdate(title = "New Title")
+
+    with patch("app.services.book_service.get_cached_book", return_value=cached_book):
+        with pytest.raises(HTTPException) as exc_info:
+            modify_book(mock_db, book_id = 1, modified_data = book_data, current_user = mock_user)
+
+        assert exc_info.value.status_code == 403
+
+
+def test_modify_book_succeeds_when_user_is_owner(mock_db, mock_user):
+    # Scenario: book's owner_id=1, mock_user.id=1 → match
+    # Expected: book is updated and returned
+
+    cached_book = {"id": 1, "title": "Test", "author": "Author", "pages": 100, "owner_id": 1}
+    fake_updated = MagicMock()
+    book_data = BookUpdate(title = "Updated Title")
+
+    with patch("app.services.book_service.get_cached_book", return_value=cached_book):
+        with patch("app.services.book_service.update_book", return_value=fake_updated):
+            with patch("app.services.book_service.invalidate_book"):
+                result = modify_book(mock_db, book_id = 1, modified_data = book_data, current_user = mock_user)
+                assert result == fake_updated
