@@ -9,21 +9,23 @@ from app.models.user import (
 from app.schemas.user import UserCreate
 from app.auth.hashing import hash_password
 
+from app.exceptions.app_exceptions import (
+    EmailAlreadyRegisteredException,
+    UserNotFoundException
+    )
+
 
 def fetch_user(db: Session, user_id: int):
     user = get_user_by_id(user_id, db)
     if not user:
-        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+        raise UserNotFoundException
     return user
 
 
 def register_user(db: Session, user_data: UserCreate) -> object:
     existing_user = get_user_by_email(db, user_data.email)
     if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Email '{user_data.email}' is already registered"
-        )
+        raise EmailAlreadyRegisteredException
     
     hashed = hash_password(user_data.password)
 

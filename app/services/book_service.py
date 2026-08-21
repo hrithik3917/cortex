@@ -18,6 +18,13 @@ from app.cache.book_cache import (
     invalidate_book
 )
 
+from exceptions.app_exceptions import (
+    BookNotFoundException,
+    DuplicateTitleException,
+    NotOwnerException
+)
+
+
 def fetch_all_books(
         db: Session,
         page:int = 1,
@@ -61,7 +68,7 @@ def fetch_book(db: Session, book_id:int):
 
     book = get_book_by_id(book_id, db)
     if not book:
-        raise HTTPException(status_code=404, detail=f" book {book_id} Not Found")
+        raise BookNotFoundException
     
 
     book_data = BookResponse.model_validate(book).model_dump()
@@ -72,7 +79,7 @@ def fetch_book(db: Session, book_id:int):
 
 def insert_book(db: Session, book_data: Bookcreate, current_user:User):
     if get_book_by_title(book_data.title, db):
-        raise HTTPException(status_code=400, detail=f"Book with title '{book_data.title}' already exists")
+        raise DuplicateTitleException
     
     data = book_data.model_dump()
     data["owner_id"] = current_user.id
@@ -89,7 +96,7 @@ def modify_book(db: Session, book_id: int, modified_data: BookUpdate, current_us
     # fetch_book may return a cached dict — ownership check needs the owner_id
     owner_id = book["owner_id"] if isinstance(book, dict) else book.owner_id
     if owner_id != current_user.id:
-        raise HTTPException(status_code=403, detail=" You can only edit your own books")
+        raise NotOwnerException
     
     updated_book = update_book(book_id, db, modified_data.model_dump())
 
@@ -104,7 +111,7 @@ def remove_book(db: Session, book_id: int, current_user: User) -> None:
 
     owner_id = book["owner_id"] if isinstance(book, dict) else book.owner_id
     if owner_id != current_user.id:
-        raise HTTPException(status_code=403, detail=" You can only delete your own books")
+        raise NotOwnerException
     
     invalidate_book(book_id)
 
