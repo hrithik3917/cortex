@@ -19,10 +19,10 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session 
 
     user_id = payload.get("user_id")
     if not user_id:
-        raise InvalidTokenException
+        raise InvalidTokenException()
     
     user = get_user_by_id(user_id, db)
     if not user:
-        raise UserNotFoundException
+        raise UserNotFoundException()
     
     return user

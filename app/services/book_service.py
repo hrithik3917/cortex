@@ -68,7 +68,7 @@ def fetch_book(db: Session, book_id:int):
 
     book = get_book_by_id(book_id, db)
     if not book:
-        raise BookNotFoundException
+        raise BookNotFoundException(book_id)
     
 
     book_data = BookResponse.model_validate(book).model_dump()
@@ -79,7 +79,7 @@ def fetch_book(db: Session, book_id:int):
 
 def insert_book(db: Session, book_data: Bookcreate, current_user:User):
     if get_book_by_title(book_data.title, db):
-        raise DuplicateTitleException
+        raise DuplicateTitleException(book_data.title)
     
     data = book_data.model_dump()
     data["owner_id"] = current_user.id
@@ -96,7 +96,7 @@ def modify_book(db: Session, book_id: int, modified_data: BookUpdate, current_us
     # fetch_book may return a cached dict — ownership check needs the owner_id
     owner_id = book["owner_id"] if isinstance(book, dict) else book.owner_id
     if owner_id != current_user.id:
-        raise NotOwnerException
+        raise NotOwnerException()
     
     updated_book = update_book(book_id, db, modified_data.model_dump())
 
@@ -111,7 +111,7 @@ def remove_book(db: Session, book_id: int, current_user: User) -> None:
 
     owner_id = book["owner_id"] if isinstance(book, dict) else book.owner_id
     if owner_id != current_user.id:
-        raise NotOwnerException
+        raise NotOwnerException()
     
     invalidate_book(book_id)
 

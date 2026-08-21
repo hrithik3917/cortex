@@ -11,10 +11,10 @@ def login_user(db: Session, email: str, password: str) -> TokenResponse:
     user = get_user_by_email(db, email)
 
     if not user:
-        raise InvalidCredentialsExceptions
+        raise InvalidCredentialsExceptions()
     
     if not verify_password(password, user.hashed_password):
-        raise InvalidCredentialsExceptions
+        raise InvalidCredentialsExceptions()
     
     token = create_access_token({"sub":user.email, "user_id": user.id})
     return TokenResponse(access_token=token, token_type="bearer")

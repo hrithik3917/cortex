@@ -18,14 +18,14 @@ from app.exceptions.app_exceptions import (
 def fetch_user(db: Session, user_id: int):
     user = get_user_by_id(user_id, db)
     if not user:
-        raise UserNotFoundException
+        raise UserNotFoundException(user_id)
     return user
 
 
 def register_user(db: Session, user_data: UserCreate) -> object:
     existing_user = get_user_by_email(db, user_data.email)
     if existing_user:
-        raise EmailAlreadyRegisteredException
+        raise EmailAlreadyRegisteredException(user_data.email)
     
     hashed = hash_password(user_data.password)
 
