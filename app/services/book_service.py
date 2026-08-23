@@ -18,7 +18,7 @@ from app.cache.book_cache import (
     invalidate_book
 )
 
-from exceptions.app_exceptions import (
+from app.exceptions.app_exceptions import (
     BookNotFoundException,
     DuplicateTitleException,
     NotOwnerException

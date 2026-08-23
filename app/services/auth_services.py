@@ -17,5 +17,8 @@ def login_user(db: Session, email: str, password: str) -> TokenResponse:
         raise InvalidCredentialsExceptions()
     
     token = create_access_token({"sub":user.email, "user_id": user.id})
+
+    if isinstance(token, bytes):
+        token = token.decode("utf-8")
     return TokenResponse(access_token=token, token_type="bearer")
 
