@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -64,11 +65,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     # Pydantic 422 errors — reshape to consistent format
     return JSONResponse(
         status_code = 422,
-        content = {
+        content = jsonable_encoder({
             "error": "Request validation failed",
             "code": "VALIDATION_ERROR",
             "details": exc.errors()
-        }
+        })
     )
 
 
