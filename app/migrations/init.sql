@@ -17,6 +17,11 @@
 --     owner_id    INTEGER REFERENCES users(id) ON DELETE CASCADE
 -- );
 
+
+-- Indexes for frequently queried columns
+-- CREATE INDEX IF NOT EXISTS idx_books_owner_id ON books(owner_id);
+-- CREATE INDEX IF NOT EXISTS idx_books_title    ON books(title);
+
 -- -- Indexes for columns you query frequently
 -- -- (no separate index on users.email: the UNIQUE constraint above already creates one)
 -- CREATE INDEX IF NOT EXISTS idx_books_owner ON books(owner_id);
