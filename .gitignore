@@ -19,3 +19,6 @@ Thumbs.db
 # Database
 *.db
 *.sqlite3
+
+# Docker
+.env.docker
