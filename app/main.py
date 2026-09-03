@@ -24,7 +24,7 @@ Base.metadata.create_all(bind=engine)
 async def lifespan(app: FastAPI):
 
     try:
-        redis_client.ping()
+        await redis_client.ping()
         print("Redis connection verified")
     except Exception as e:
         print(f" Redis not available: {e}")
@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     yield
 
     print("Shutting down - closing redis connection")
-    redis_client.close()
+    await redis_client.close()
     
 
 app = FastAPI(title="Book API", lifespan=lifespan)
