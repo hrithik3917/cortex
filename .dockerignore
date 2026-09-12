@@ -1,7 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
-.env
 .git
 .pytest_cache/
 _coverage
@@ -9,4 +8,6 @@ tests/
 dev.ps1
 latency_compare.py
 *.md
+.env
 .env.docker
+.env.compose

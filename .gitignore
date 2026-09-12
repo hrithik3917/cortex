@@ -22,3 +22,4 @@ Thumbs.db
 
 # Docker
 .env.docker
+.env.compose
