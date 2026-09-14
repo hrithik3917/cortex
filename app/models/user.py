@@ -1,8 +1,9 @@
-from app.database import Base
-from sqlalchemy import Integer, String, Boolean, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
 from datetime import datetime, timezone
-from typing import Optional
+
+from sqlalchemy import Boolean, DateTime, Integer, String
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+
+from app.database import Base
 
 
 class User(Base):
@@ -16,18 +17,18 @@ class User(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
-    # String ref "Book" 
+    # String ref "Book"
     books = relationship("Book", back_populates="owner", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"User(id={self.id}, email={self.email})"
 
 
-def get_user_by_id(user_id: int, db: Session) -> Optional[User]:
+def get_user_by_id(user_id: int, db: Session) -> User | None:
     return db.query(User).filter(User.id == user_id).first()
 
 
-def get_user_by_email(db: Session, email: str) -> Optional[User]:
+def get_user_by_email(db: Session, email: str) -> User | None:
     return db.query(User).filter(User.email == email).first()
 
 

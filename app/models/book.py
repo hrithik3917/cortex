@@ -1,7 +1,7 @@
+from sqlalchemy import ForeignKey, Index, Integer, String
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+
 from app.database import Base
-from sqlalchemy import Integer, String, ForeignKey, Index
-from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
-from typing import Optional
 
 
 class Book(Base):
@@ -11,7 +11,7 @@ class Book(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     author: Mapped[str] = mapped_column(String(255), nullable=False)
     pages: Mapped[int] = mapped_column(Integer, nullable=False)
-    owner_id: Mapped[Optional[int]] = mapped_column(
+    owner_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=True
     )
 
@@ -25,14 +25,11 @@ class Book(Base):
 
     def __repr__(self):
         return f"title={self.title}, author={self.author}"
-    
+
 
 def get_all_books(
-        db:Session,
-        skip: int = 0,
-        limit: int = 10,
-        author: str | None = None
-        ) -> tuple[list[Book], int]:
+    db: Session, skip: int = 0, limit: int = 10, author: str | None = None
+) -> tuple[list[Book], int]:
 
     query = db.query(Book)
 
@@ -46,16 +43,18 @@ def get_all_books(
     return books, total
 
 
-def get_book_by_id(book_id:int, db: Session) -> Optional[Book]:
+def get_book_by_id(book_id: int, db: Session) -> Book | None:
     return db.query(Book).filter(Book.id == book_id).first()
 
 
-def get_book_by_title(title: str, db: Session) -> Optional[Book]:
+def get_book_by_title(title: str, db: Session) -> Book | None:
     return db.query(Book).filter(Book.title.ilike(title)).first()
 
 
 def insert_book(db: Session, book_data) -> Book:
-    payload = book_data.model_dump() if hasattr(book_data, "model_dump") else dict(book_data)
+    payload = (
+        book_data.model_dump() if hasattr(book_data, "model_dump") else dict(book_data)
+    )
     book = Book(**payload)
     db.add(book)
     db.commit()
@@ -84,4 +83,3 @@ def delete_book(book_id: int, db: Session) -> None:
 
     db.delete(book)
     db.commit()
-

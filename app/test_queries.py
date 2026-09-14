@@ -3,9 +3,10 @@ Standalone script demonstrating the 3 required SQLAlchemy relationship queries.
 Run from the week1_practise directory:
     python -m book_api.test_queries
 """
-from app.database import SessionLocal, Base, engine
-from app.models.user import User
+
+from app.database import Base, SessionLocal, engine
 from app.models.book import Book
+from app.models.user import User
 
 Base.metadata.create_all(bind=engine)
 
@@ -19,10 +20,22 @@ def run():
         db.commit()
         db.refresh(user)
 
-        db.add_all([
-            Book(title="Clean Code", author="Robert Martin", pages=431, owner_id=user.id),
-            Book(title="The Pragmatic Programmer", author="Hunt & Thomas", pages=352, owner_id=user.id),
-        ])
+        db.add_all(
+            [
+                Book(
+                    title="Clean Code",
+                    author="Robert Martin",
+                    pages=431,
+                    owner_id=user.id,
+                ),
+                Book(
+                    title="The Pragmatic Programmer",
+                    author="Hunt & Thomas",
+                    pages=352,
+                    owner_id=user.id,
+                ),
+            ]
+        )
         db.commit()
         print(f"Setup complete — user id={user.id}, 2 books created.\n")
 

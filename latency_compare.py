@@ -1,7 +1,8 @@
 # latency_compare.py
-import time
-import requests
 import subprocess
+import time
+
+import requests
 
 BASE_URL = "http://127.0.0.1:8000/v1"
 ITERATIONS = 50
@@ -17,12 +18,12 @@ def measure_response_times(label: str, iterations: int) -> dict:
             times.append((end - start) * 1000)  # convert to milliseconds
 
     return {
-        "label":   label,
-        "avg_ms":  sum(times) / len(times),
-        "min_ms":  min(times),
-        "max_ms":  max(times),
+        "label": label,
+        "avg_ms": sum(times) / len(times),
+        "min_ms": min(times),
+        "max_ms": max(times),
         "total_s": sum(times) / 1000,
-        "count":   len(times)
+        "count": len(times),
     }
 
 
@@ -44,8 +45,9 @@ if __name__ == "__main__":
     # ── WITHOUT CACHE ─────────────────────────────────────────────────
     # Flush Redis so every request hits Postgres
     subprocess.run(
-        ["docker", "exec", "redis-book-api", "redis-cli", "FLUSHALL"],
-        capture_output=True
+        ["docker", "compose", "exec", "-T", "redis", "redis-cli", "FLUSHALL"],
+        capture_output=True,
+        check=True,
     )
     print("🗑️  Redis flushed — cache is cold")
 
@@ -54,8 +56,9 @@ if __name__ == "__main__":
 
     # Flush again so warm-up doesn't prime the cache
     subprocess.run(
-        ["docker", "exec", "redis-book-api", "redis-cli", "FLUSHALL"],
-        capture_output=True
+        ["docker", "compose", "exec", "-T", "redis", "redis-cli", "FLUSHALL"],
+        capture_output=True,
+        check=True,
     )
 
     no_cache = measure_response_times("WITHOUT CACHE (Postgres every time)", ITERATIONS)
@@ -74,7 +77,7 @@ if __name__ == "__main__":
     savings = no_cache["avg_ms"] - with_cache["avg_ms"]
 
     print(f"\n{'═' * 40}")
-    print(f"  RESULT")
+    print("  RESULT")
     print(f"{'═' * 40}")
     print(f"  Without cache: {no_cache['avg_ms']:.2f} ms avg")
     print(f"  With cache:    {with_cache['avg_ms']:.2f} ms avg")

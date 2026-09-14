@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
 from app.schemas.book import BookResponse
 
 
@@ -18,5 +20,4 @@ class UserResponse(BaseModel):
 
 
 class UserWithBooks(UserResponse):
-    books: list[BookResponse] = [] 
-
+    books: list[BookResponse] = []
