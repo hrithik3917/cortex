@@ -11,7 +11,7 @@ Month 1 — SDE Core: FastAPI + PostgreSQL + Authentication + redis
 - PostgreSQL + SQLAlchemy
 - JWT Authentication
 - Redis
-- Docker (coming Week 4)
+- Docker
 
 ## Run Locally
 ```bash
